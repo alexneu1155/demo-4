@@ -1,0 +1,58 @@
+name: Manual Playwright Test Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'Select the target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+        default: 'dev'
+      test_tag:
+        description: 'Enter the test tag to run (e.g., @t1, @regression)'
+        required: true
+        type: string
+
+jobs:
+  execute-tests:
+    name: Run ${{ inputs.test_tag }} tests on ${{ inputs.env }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display Selected Inputs
+        run: |
+          echo "Target Environment: ${{ inputs.env }}"
+          echo "Test Tag: ${{ inputs.test_tag }}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # Run Playwright using the --grep flag to filter by the provided tag
+      - name: Run Playwright tests
+        run: npx playwright test --grep "${{ inputs.test_tag }}"
+        env:
+          # Pass the environment to your playwright config
+          TEST_ENV: ${{ inputs.env }} 
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
