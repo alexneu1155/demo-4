@@ -9,6 +9,13 @@
   "description": "",
   "devDependencies": {
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "dotenv": "^17.4.2"
+  },
+  "dependencies": {
+    "mariadb": "^3.5.2",
+    "pg": "^8.20.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.28"
   }
 }
